@@ -11,7 +11,33 @@ const password = ref("");
 const errorMessage = ref("");
 const router = useRouter();
 
-const registerUser = async () => {};
+const registerUser = async () => {
+  try {
+    const response = await fetch(`${backendIP}/api/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      errorMessage.value = errorText || "Ogiltigt användarnamn eller lösenord";
+      return;
+    }
+
+    const data = await response.json();
+    localStorage.setItem("token", data.token);
+    router.push("/homepage");
+  } catch (error) {
+    errorMessage.value = "Något gick fel med registreringen";
+    console.error(error);
+  }
+};
+
+
 const login = async () => {
   try {
     const response = await fetch(`${backendIP}/api/login`, {
@@ -66,6 +92,8 @@ const login = async () => {
   </button>
 
   <p v-if="errorMessage">{{ errorMessage }}</p>
+
+  <router-link to="homepage">homepage</router-link>
 </template>
 
 <style scoped></style>
