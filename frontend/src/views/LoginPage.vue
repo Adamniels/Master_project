@@ -1,3 +1,34 @@
+<template>
+  <h1>Welcome to Ascendify</h1>
+
+  <div v-if="register">
+    <form @submit.prevent="registerUser">
+      <input v-model="username" placeholder="Username" />
+      <input v-model="password" placeholder="Password" />
+      <button type="submit">Registrera</button>
+    </form>
+  </div>
+
+  <div v-else>
+    <form @submit.prevent="login">
+      <input v-model="username" placeholder="Username" />
+      <input v-model="password" placeholder="Password" />
+      <button type="submit">Logga in</button>
+    </form>
+  </div>
+
+  <!-- Växlingsknappen -->
+  <button @click="register = !register" style="margin-top: 1rem">
+    {{
+      register ? "Redan medlem? Logga in här" : "Ny användare? Registrera dig"
+    }}
+  </button>
+
+  <p v-if="errorMessage">{{ errorMessage }}</p>
+
+  <router-link to="homepage">homepage</router-link>
+</template>
+
 <script setup lang="ts">
 import { ref } from "vue";
 import { getBackendIP } from "../utils";
@@ -30,13 +61,14 @@ const registerUser = async () => {
 
     const data = await response.json();
     localStorage.setItem("token", data.token);
+    localStorage.setItem("username", username.value);
+
     router.push("/homepage");
   } catch (error) {
     errorMessage.value = "Något gick fel med registreringen";
     console.error(error);
   }
 };
-
 
 const login = async () => {
   try {
@@ -57,6 +89,8 @@ const login = async () => {
 
     const data = await response.json();
     localStorage.setItem("token", data.token);
+    localStorage.setItem("username", username.value);
+
     router.push("/homepage");
   } catch (error) {
     errorMessage.value = "Något gick fel med inloggningen";
@@ -64,36 +98,5 @@ const login = async () => {
   }
 };
 </script>
-
-<template>
-  <h1>Welcome to Ascendify</h1>
-
-  <div v-if="register">
-    <form @submit.prevent="registerUser">
-      <input v-model="username" placeholder="Username" />
-      <input v-model="password" placeholder="Password" />
-      <button type="submit">Registrera</button>
-    </form>
-  </div>
-
-  <div v-else>
-    <form @submit.prevent="login">
-      <input v-model="username" placeholder="Username" />
-      <input v-model="password" placeholder="Password" />
-      <button type="submit">Logga in</button>
-    </form>
-  </div>
-
-  <!-- Växlingsknappen -->
-  <button @click="register = !register" style="margin-top: 1rem">
-    {{
-      register ? "Redan medlem? Logga in här" : "Ny användare? Registrera dig"
-    }}
-  </button>
-
-  <p v-if="errorMessage">{{ errorMessage }}</p>
-
-  <router-link to="homepage">homepage</router-link>
-</template>
 
 <style scoped></style>
